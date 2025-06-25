@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import os
 pygame.init()
 
 # Initialize pygame and set up the display
@@ -26,14 +27,14 @@ pot = pygame.image.load('assets/teapot.webp').convert_alpha()
 box = pygame.image.load('assets/wooden_box.webp').convert_alpha()
 
 #Set initial coordinates
-hero_x_pos = 15
+hero_x_pos = 50
 hero_y_pos = 130
 pot_x_pos = 1000
-pot_y_pos = 275
+pot_y_pos = 320
 candle_x_pos = 1000
-candle_y_pos = 30
+candle_y_pos = 90
 box_x_pos = 1000
-box_y_pos = 180
+box_y_pos = 230
 
 pot_flag = False
 box_flag = False
@@ -45,6 +46,13 @@ candle_rect = candle.get_rect(center=(candle_x_pos, candle_y_pos))
 box_rect = box.get_rect(center=(box_x_pos, box_y_pos))
 
 start_time = pygame.time.get_ticks()
+
+high_score_file = "high_score.txt"
+if os.path.exists(high_score_file):
+    with open(high_score_file, "r") as file:
+        high_score = int(file.read().strip())
+else:
+    high_score = 0
 
 # Main game loop
 game = True
@@ -79,7 +87,9 @@ while game:
         screen.blit(box, box_rect)
         screen.blit(pot, pot_rect)
         score_surface = text_font.render(f"Score: {survival_seconds}", False, 'White')
+        high_score_surface = text_font.render(f"High Score: {high_score}", False, 'Yellow')
         screen.blit(score_surface, (10, 10))
+        screen.blit(high_score_surface, (10, 30))
 
 
         # Add movement
@@ -114,6 +124,10 @@ while game:
             final_score = text_font.render(f"Your score: {survival_seconds}", False, 'Red')
             screen.blit(final_score, (300, 195))
             game_active = False
+            if survival_seconds > high_score:
+                high_score = survival_seconds
+                with open(high_score_file, "w") as file:
+                    file.write(str(high_score))
 
         # keep hero within game boundaries
         if hero_rect.top < 0:
